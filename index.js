@@ -1,42 +1,22 @@
-const Discogs = require('disconnect').Client
+// index.js
 
-const db = new Discogs().database()
-const col = new Discogs().user().collection()
+const express = require('express')
+const { fetchTrackCollection } = require('./discogs')
 
-const trackCollection = []
+const app = express()
+const PORT = 3000
 
-try {
-	col.getReleases('marcusmcb', 0, { page: 1, per_page: 5 }, (err, data) => {
-		data.releases.map((item) => {
-			db.getRelease(item.id, (err, data) => {
-				data.tracklist.map((track) => {
-					let artistString = ''
+app.get('/fetch-tracks', async (req, res) => {
+	try {
+		const tracks = await fetchTrackCollection()
+		console.log('TRACK COLLECTION: ', tracks)
+		res.status(200).send('Tracks fetched and logged successfully!')
+	} catch (error) {
+		console.error('ERROR: ', error)
+		res.status(500).send('Error fetching tracks.')
+	}
+})
 
-					for (let i = 0; i < data.artists.length; i++) {
-						artistString += data.artists[i].name
-						if (i !== data.artists.length - 1) {
-							artistString += data.artists[i].join
-								? ` ${data.artists[i].join} `
-								: ' & '
-						}
-					}
-
-					const transformedTrack = {
-						artist: artistString,
-						title: track.title,
-						duration: track.duration,
-						year: data.year && data.year !== 0 ? data.year : '',
-						bpm: '',
-					}
-
-					// Push each transformedTrack to the trackCollection array
-					trackCollection.push(transformedTrack)
-				})
-
-				console.log('TRACK COLLECTION: ', trackCollection)
-			})
-		})
-	})
-} catch (error) {
-	console.error('ERROR: ', error)
-}
+app.listen(PORT, () => {
+	console.log(`Server started on http://localhost:${PORT}`)
+})
