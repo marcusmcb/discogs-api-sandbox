@@ -1,3 +1,26 @@
+:root {
+	--main-bg-color: rgb(49, 49, 49);
+	--highlight-color: rgb(74, 242, 228);
+	--success-color: rgb(87, 255, 104);
+	--error-color: rgb(255, 136, 136);
+	--fira-sans: 'Fira Sans', sans-serif;
+	--dm-sans: 'DM Sans', sans-serif;
+}
+
 .App {
+	/* text-align: center; */
+  font-family: var(--fira-sans);
+}
+
+.button-box {
   text-align: center;
+}
+
+button {
+  border-radius: 5px;
+  border: none;
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  font-family: var(--dm-sans);
 }

@@ -11,7 +11,7 @@ const fetchTrackCollection = async () => {
 			col.getReleases(
 				'marcusmcb',
 				0,
-				{ page: 1, per_page: 20 },
+				{ page: 1, per_page: 40 },
 				(err, data) => {
 					if (err) {
 						return reject(err)
@@ -30,7 +30,7 @@ const fetchTrackCollection = async () => {
 
 								for (let i = 0; i < data.artists.length; i++) {
 									artistString += data.artists[i].name
-									if (i !== data.artists.length - 1) {
+									if (i !== data.artists.length - 1) {                    
 										artistString += data.artists[i].join
 											? ` ${data.artists[i].join} `
 											: ' & '
@@ -62,16 +62,6 @@ const fetchTrackCollection = async () => {
 		}
 	})
 }
-
-// Usage
-// ;(async () => {
-// 	try {
-// 		const tracks = await fetchTrackCollection()
-// 		console.log('TRACK COLLECTION: ', tracks)
-// 	} catch (error) {
-// 		console.error('ERROR: ', error)
-// 	}
-// })()
 
 module.exports = {
   fetchTrackCollection
