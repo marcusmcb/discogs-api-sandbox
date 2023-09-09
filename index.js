@@ -1,36 +1,42 @@
-const Discogs = require("disconnect").Client;
+const Discogs = require('disconnect').Client
 
-const db = new Discogs().database();
-const col = new Discogs().user().collection();
+const db = new Discogs().database()
+const col = new Discogs().user().collection()
 
-db.getRelease(579312, (err, data) => {
-  console.log(data.year);
-  console.log(data.artists[0].name);
-  console.log(data.genres);
-  console.log(data.styles);
-  console.log(data.tracklist);
-});
+const trackCollection = []
 
-col.getReleases("marcusmcb", 0, { page: 1, per_page: 5 }, (err, data) => {
-  console.log("DATA: ");
-  console.log(data.releases);
-  data.releases.map((item) => {
-    db.getRelease(item.id, (err, data) => {
-      console.log("YEAR: ", data.year);
-      console.log("ARTIST: ", data.artists[0].name);
-      console.log(data.genres);
-      console.log(data.styles);
-      console.log(data.tracklist);
-    });
-  });
+try {
+	col.getReleases('marcusmcb', 0, { page: 1, per_page: 5 }, (err, data) => {
+		data.releases.map((item) => {
+			db.getRelease(item.id, (err, data) => {
+				data.tracklist.map((track) => {
+					let artistString = ''
 
-  //   function extractTitleAndArtists(data) {
-  //     return data.map(item => ({
-  //       title: item.basic_information.title,
-  //       artists: item.basic_information.artists[0]
-  //     }));
-  //   }
+					for (let i = 0; i < data.artists.length; i++) {
+						artistString += data.artists[i].name
+						if (i !== data.artists.length - 1) {
+							artistString += data.artists[i].join
+								? ` ${data.artists[i].join} `
+								: ' & '
+						}
+					}
 
-  //   const result = extractTitleAndArtists(data.releases);
-  //   console.log(result);
-});
+					const transformedTrack = {
+						artist: artistString,
+						title: track.title,
+						duration: track.duration,
+						year: data.year && data.year !== 0 ? data.year : '',
+						bpm: '',
+					}
+
+					// Push each transformedTrack to the trackCollection array
+					trackCollection.push(transformedTrack)
+				})
+
+				console.log('TRACK COLLECTION: ', trackCollection)
+			})
+		})
+	})
+} catch (error) {
+	console.error('ERROR: ', error)
+}
