@@ -3,12 +3,15 @@ import axios from 'axios'
 import './App.css'
 
 type Track = {
-	[key: string]: string | number
+	[key: string]: string | number | string[]
 	artist: string
 	title: string
 	duration: string
 	year: number
 	bpm: string
+	genre: string[]
+	style: string[]
+	country: string
 }
 
 const App = () => {
@@ -19,6 +22,7 @@ const App = () => {
 	} | null>(null)
 	const [sortColumn, setSortColumn] = useState<string | null>(null)
 	const [isAscending, setIsAscending] = useState<boolean>(true)
+	const [searchQuery, setSearchQuery] = useState<string>('')
 
 	const handleDataClick = async (event: React.FormEvent) => {
 		try {
@@ -66,18 +70,34 @@ const App = () => {
 	const renderCell = (
 		rowIndex: number,
 		column: string,
-		value: string | number
+		value: string | number | string[]
 	) => {
+		const renderCellContent = Array.isArray(value) ? value.join(', ') : value
+
 		if (editField?.row === rowIndex && editField.col === column) {
 			return (
 				<input
-					value={value}
+					value={renderCellContent.toString()} // Convert to string in case it's an array or number
 					onChange={(e) => handleValueChange(rowIndex, column, e.target.value)}
 					onBlur={() => setEditField(null)}
 				/>
 			)
 		}
-		return value
+		return renderCellContent
+	}
+
+	const filterTracks = (tracks: Track[]): Track[] => {
+		if (!searchQuery.trim()) return tracks // Return all tracks if search is empty
+
+		return tracks.filter((track) =>
+			Object.values(track).some((value) =>
+				Array.isArray(value)
+					? value.some((item) =>
+							item.toLowerCase().includes(searchQuery.toLowerCase())
+					  )
+					: value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+			)
+		)
 	}
 
 	return (
@@ -101,24 +121,42 @@ const App = () => {
 				<div className='button-box'>No tracks</div>
 			) : (
 				<div>
+					<input
+						type='text'
+						placeholder='Search tracks...'
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+					/>
+
 					<table style={{ borderCollapse: 'collapse' }}>
 						<thead>
 							<tr>
-								{['artist', 'title', 'duration', 'year', 'bpm'].map(
-									(column) => (
-										<th
-											key={column}
-											onClick={() => handleSort(column)}
-											style={{ cursor: 'pointer', padding: '8px' }}
-										>
-											{column}
-										</th>
-									)
-								)}
+								{[
+									'artist',
+									'title',
+									'duration',
+									'year',
+									'bpm',
+									'genre',
+									'style',
+									'country',
+								].map((column) => (
+									<th
+										key={column}
+										onClick={() => handleSort(column)}
+										style={{
+											cursor: 'pointer',
+											padding: '8px',
+											textAlign: 'left',
+										}}
+									>
+										{column}
+									</th>
+								))}
 							</tr>
 						</thead>
 						<tbody>
-							{trackCollection.map((track, rowIndex) => (
+							{filterTracks(trackCollection).map((track, rowIndex) => (
 								<tr
 									key={rowIndex}
 									style={{ borderBottom: '1px solid lightgrey' }}

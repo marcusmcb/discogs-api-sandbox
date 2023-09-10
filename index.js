@@ -11,8 +11,7 @@ app.use(cors())
 
 app.get('/fetch-tracks', async (req, res) => {
 	try {
-		const tracks = await fetchTrackCollection()		
-		console.log(tracks)
+		const tracks = await fetchTrackCollection()				
 		res.status(200).send(tracks)
 	} catch (error) {
 		console.error('API ERROR: ', error)
