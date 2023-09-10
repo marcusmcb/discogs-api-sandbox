@@ -12,6 +12,7 @@ type Track = {
 	genre: string[]
 	style: string[]
 	country: string
+	labels: string[]
 }
 
 const App = () => {
@@ -140,6 +141,7 @@ const App = () => {
 									'genre',
 									'style',
 									'country',
+									'labels'
 								].map((column) => (
 									<th
 										key={column}
