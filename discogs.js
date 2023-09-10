@@ -31,7 +31,7 @@ const fetchTrackCollection = async () => {
 			col.getReleases(
 				'marcusmcb',
 				0,
-				{ page: 1, per_page: 35 },
+				{ page: 1, per_page: 58 },
 				(err, data) => {
 					if (err) {
 						return reject(err)
@@ -72,7 +72,7 @@ const fetchTrackCollection = async () => {
 								let artistString = ''
 								// console.log("MAIN ARTIST?: ")
 								// console.log(data.artists)
-								if (data.artists[0].name === 'Various') {
+								if (data.artists[0].name === 'Various' || track.artists) {
 									// console.log('-----------------')
 									// console.log('TRACK ARTIST: ', track.artists[0].name)
 									// console.log('TITLE: ', track.title)
