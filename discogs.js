@@ -1,7 +1,13 @@
 const Discogs = require('disconnect').Client
+const dotenv = require('dotenv')
 
-const db = new Discogs().database()
-const col = new Discogs().user().collection()
+dotenv.config()
+
+const token = process.env.DISCOGS_ACCESS_TOKEN
+const discogs = new Discogs({ userToken: token });
+
+const db = discogs.database();
+const col = discogs.user().collection();
 
 const fetchTrackCollection = async () => {
 	const trackCollection = []
@@ -11,7 +17,7 @@ const fetchTrackCollection = async () => {
 			col.getReleases(
 				'marcusmcb',
 				0,
-				{ page: 1, per_page: 40 },
+				{ page: 1, per_page: 5 },
 				(err, data) => {
 					if (err) {
 						return reject(err)
@@ -58,6 +64,8 @@ const fetchTrackCollection = async () => {
 				}
 			)
 		} catch (error) {
+      console.log("DISCOGS ERROR: ")
+      console.log(error)
 			reject(error)
 		}
 	})

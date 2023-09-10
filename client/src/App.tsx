@@ -46,7 +46,6 @@ const App = () => {
 			if (a[column] > b[column]) return isAscending ? 1 : -1
 			return 0
 		})
-
 		setTrackCollection(sorted)
 	}
 

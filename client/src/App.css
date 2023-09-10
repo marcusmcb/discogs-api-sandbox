@@ -8,19 +8,18 @@
 }
 
 .App {
-	/* text-align: center; */
-  font-family: var(--fira-sans);
+	font-family: var(--fira-sans);
 }
 
 .button-box {
-  text-align: center;
+	text-align: center;
 }
 
 button {
-  border-radius: 5px;
-  border: none;
-  background-color: black;
-  color: white;
-  padding: 10px 20px;
-  font-family: var(--dm-sans);
+	border-radius: 5px;
+	border: none;
+	background-color: black;
+	color: white;
+	padding: 10px 20px;
+	font-family: var(--dm-sans);
 }
