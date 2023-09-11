@@ -8,7 +8,7 @@ type Track = {
 	duration: string
 	year: number
 	bpm: string
-  format: string
+	format: string
 	genre: string[]
 	style: string[]
 	country: string
@@ -57,30 +57,31 @@ const TrackCollection: React.FC<TrackCollectionProps> = ({
 	}
 
 	const doResize = (e: MouseEvent) => {
-    if (!resizing) return;
-    
-    // Find the th element
-    const thElement = document.querySelector(`th[data-column="${resizing.column}"]`);
-    if (!thElement) return;
-  
-    // Calculate width difference
-    const widthDiff = e.clientX - resizing.initialX;
-    const newWidth = thElement.getBoundingClientRect().width + widthDiff;
-  
-    setColumnWidths(prevWidths => ({
-      ...prevWidths,
-      [resizing.column]: newWidth,
-    }));
-  
-    // Update the initialX for the next mousemove event
-    if (resizing) {
-      setResizing({
-        ...resizing,
-        initialX: e.clientX,
-      });
-    }
-  };
-  
+		if (!resizing) return
+
+		// Find the th element
+		const thElement = document.querySelector(
+			`th[data-column="${resizing.column}"]`
+		)
+		if (!thElement) return
+
+		// Calculate width difference
+		const widthDiff = e.clientX - resizing.initialX
+		const newWidth = thElement.getBoundingClientRect().width + widthDiff
+
+		setColumnWidths((prevWidths) => ({
+			...prevWidths,
+			[resizing.column]: newWidth,
+		}))
+
+		// Update the initialX for the next mousemove event
+		if (resizing) {
+			setResizing({
+				...resizing,
+				initialX: e.clientX,
+			})
+		}
+	}
 
 	const stopResize = () => {
 		// Remove event listeners
@@ -121,9 +122,9 @@ const TrackCollection: React.FC<TrackCollectionProps> = ({
 							'duration',
 							'year',
 							'bpm',
-              'format',
+							'format',
 							'genre',
-							'style',
+							'subgenre',
 							'country',
 							'label(s)',
 						].map((column) => (

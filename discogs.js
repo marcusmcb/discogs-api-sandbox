@@ -42,6 +42,7 @@ const fetchTrackCollection = async () => {
 							}
 
 							let trackLabels = []
+							const format = data.formats[0].descriptions[0]
 
 							if (data.labels) {
 								if (data.labels.length > 1) {
@@ -60,14 +61,9 @@ const fetchTrackCollection = async () => {
 								}
 								trackLabels = uniqueLabels(trackLabels)
 								console.log('SET? ', trackLabels)
-							}
-
-							const format = data.formats[0].descriptions[0]
-							console.log("FORMAT: ", format)
-
-							data.tracklist.forEach((track) => {
-								// console.log('-----------------------------')
-								// console.log('TRACK: ', track)
+							}							
+							
+							data.tracklist.forEach((track) => {								
 								let artistString = ''
 								if (data.artists[0].name === 'Various' || track.artists) {
 									artistString = track.artists[0].name
