@@ -11,7 +11,10 @@ app.use(cors())
 
 app.get('/fetch-tracks', async (req, res) => {
 	try {
-		const tracks = await fetchTrackCollection()				
+		console.log("REQ: ", req.query)
+		const discogsProfileName = req.query.profileName
+		console.log("FOO? ", discogsProfileName)
+		const tracks = await fetchTrackCollection(discogsProfileName)				
 		res.status(200).send(tracks)
 	} catch (error) {
 		console.error('API ERROR: ', error)

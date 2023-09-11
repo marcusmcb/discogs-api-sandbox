@@ -9,7 +9,7 @@ const discogs = new Discogs({ userToken: token })
 const db = discogs.database()
 const col = discogs.user().collection()
 
-const fetchTrackCollection = async () => {
+const fetchTrackCollection = async (discogsProfileName) => {
 	const trackCollection = []
 
 	return new Promise((resolve, reject) => {
@@ -25,9 +25,9 @@ const fetchTrackCollection = async () => {
 			// })
 
 			col.getReleases(
-				'marcusmcb',
+				discogsProfileName,
 				0,
-				{ page: 1, per_page: 50 },
+				{ page: 1, per_page: 5 },
 				(err, data) => {
 					if (err) {
 						return reject(err)

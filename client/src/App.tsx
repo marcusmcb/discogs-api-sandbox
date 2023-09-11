@@ -26,10 +26,16 @@ const App = () => {
 	const [sortColumn, setSortColumn] = useState<string | null>(null)
 	const [isAscending, setIsAscending] = useState<boolean>(true)
 	const [searchQuery, setSearchQuery] = useState<string>('')
+	const [profileName, setProfileName] = useState<string>('')
 
 	const handleDataClick = async (event: React.FormEvent) => {
 		try {
-			const response = await axios.get(`http://localhost:5000/fetch-tracks`)
+			console.log("PROFILE?: ", profileName)
+			const response = await axios.get(`http://localhost:5000/fetch-tracks`, {
+				params: {
+					profileName: profileName,
+				},
+			})
 			console.log('EXPRESS RESPONSE: ')
 			console.log(response.data)
 			setTrackCollection(response.data)
@@ -39,7 +45,7 @@ const App = () => {
 		}
 	}
 
-	const handleSort = (column: string) => {		
+	const handleSort = (column: string) => {
 		if (sortColumn === column) {
 			setIsAscending(!isAscending)
 		} else {
@@ -94,8 +100,15 @@ const App = () => {
 				<div style={{ padding: '15px', fontWeight: '600', fontSize: '20px' }}>
 					Vinyl Collection App
 				</div>
+				<input
+					type='text'
+					placeholder='Enter Discogs profile name'
+					value={profileName}
+					onChange={(e) => setProfileName(e.target.value)}
+				/>
+
 				<button
-					style={{ marginBottom: '15px' }}
+					style={{ marginBottom: '15px', marginTop: '15px' }}
 					onClick={(event) => {
 						handleDataClick(event)
 					}}
