@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import TrackCollection from './components/TrackCollection'
 import './App.css'
 
 type Track = {
@@ -9,6 +10,7 @@ type Track = {
 	duration: string
 	year: number
 	bpm: string
+	format: string
 	genre: string[]
 	style: string[]
 	country: string
@@ -37,8 +39,7 @@ const App = () => {
 		}
 	}
 
-	const handleSort = (column: string) => {
-		// Toggle sort direction if column is re-selected
+	const handleSort = (column: string) => {		
 		if (sortColumn === column) {
 			setIsAscending(!isAscending)
 		} else {
@@ -87,20 +88,6 @@ const App = () => {
 		return renderCellContent
 	}
 
-	const filterTracks = (tracks: Track[]): Track[] => {
-		if (!searchQuery.trim()) return tracks // Return all tracks if search is empty
-
-		return tracks.filter((track) =>
-			Object.values(track).some((value) =>
-				Array.isArray(value)
-					? value.some((item) =>
-							item.toLowerCase().includes(searchQuery.toLowerCase())
-					  )
-					: value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-			)
-		)
-	}
-
 	return (
 		<div className='App'>
 			<div className='button-box'>
@@ -121,62 +108,15 @@ const App = () => {
 			{trackCollection.length === 0 ? (
 				<div className='button-box'>No tracks</div>
 			) : (
-				<div>
-					<input
-						type='text'
-						placeholder='Search tracks...'
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-					/>
-
-					<table style={{ borderCollapse: 'collapse' }}>
-						<thead>
-							<tr>
-								{[
-									'artist',
-									'title',
-									'duration',
-									'year',
-									'bpm',
-									'genre',
-									'style',
-									'country',
-									'labels'
-								].map((column) => (
-									<th
-										key={column}
-										onClick={() => handleSort(column)}
-										style={{
-											cursor: 'pointer',
-											padding: '8px',
-											textAlign: 'left',
-										}}
-									>
-										{column}
-									</th>
-								))}
-							</tr>
-						</thead>
-						<tbody>
-							{filterTracks(trackCollection).map((track, rowIndex) => (
-								<tr
-									key={rowIndex}
-									style={{ borderBottom: '1px solid lightgrey' }}
-								>
-									{Object.keys(track).map((column) => (
-										<td
-											key={column}
-											onDoubleClick={() => handleDoubleClick(rowIndex, column)}
-											style={{ padding: '8px' }}
-										>
-											{renderCell(rowIndex, column, (track as any)[column])}
-										</td>
-									))}
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
+				<TrackCollection
+					trackCollection={trackCollection}
+					sortColumn={sortColumn}
+					handleSort={handleSort}
+					handleDoubleClick={handleDoubleClick}
+					renderCell={renderCell}
+					searchQuery={searchQuery}
+					setSearchQuery={setSearchQuery}
+				/>
 			)}
 		</div>
 	)

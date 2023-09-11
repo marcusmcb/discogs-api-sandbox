@@ -1,0 +1,8 @@
+/* App.css or another CSS/SCSS file */
+.vinyl-track-collection th,
+.vinyl-track-collection td {
+  overflow: hidden;
+  white-space: nowrap;
+  resize: horizontal; /* This allows the element to be resizable */
+  max-width: 300px; /* Any max value you prefer */
+}

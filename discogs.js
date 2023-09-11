@@ -18,20 +18,16 @@ const fetchTrackCollection = async () => {
 			// 	if (err) {
 			// 		return reject(err)
 			// 	} else {
-			// 		console.log('DATA: ')
-			// 		console.log(data.artists)
-			// 		// console.log(data.tracklist)
-			// 		data.tracklist.forEach((track) => {
-			// 			console.log(track.artists)
-			// 			console.log(track.title)
-			// 		})
+			// 		console.log('DATA: ')					
+			// 		console.log(Object.keys(data))
+			// 		console.log(data)
 			// 	}
 			// })
 
 			col.getReleases(
 				'marcusmcb',
 				0,
-				{ page: 1, per_page: 58 },
+				{ page: 1, per_page: 50 },
 				(err, data) => {
 					if (err) {
 						return reject(err)
@@ -63,28 +59,20 @@ const fetchTrackCollection = async () => {
 									return [...new Set(arr)]
 								}
 								trackLabels = uniqueLabels(trackLabels)
-								console.log("SET? ", trackLabels)
+								console.log('SET? ', trackLabels)
 							}
+
+							const format = data.formats[0].descriptions[0]
+							console.log("FORMAT: ", format)
 
 							data.tracklist.forEach((track) => {
 								// console.log('-----------------------------')
 								// console.log('TRACK: ', track)
 								let artistString = ''
-								// console.log("MAIN ARTIST?: ")
-								// console.log(data.artists)
 								if (data.artists[0].name === 'Various' || track.artists) {
-									// console.log('-----------------')
-									// console.log('TRACK ARTIST: ', track.artists[0].name)
-									// console.log('TITLE: ', track.title)
 									artistString = track.artists[0].name
 								} else {
-									// console.log('-----------------')
-									// console.log('MAIN ARTIST:', data.artists[0].name)
-									// console.log('TITLE: ', track.title)
 									for (let i = 0; i < data.artists.length; i++) {
-										// console.log("ARTIST NAME:")
-										// console.log(data.artists[i].name, i)
-										// console.log('---------------')
 										artistString += data.artists[i].name
 										if (i !== data.artists.length - 1) {
 											artistString += data.artists[i].join
@@ -94,22 +82,13 @@ const fetchTrackCollection = async () => {
 									}
 								}
 
-								// if (artistString === 'Various') {
-								// 	for (let i = 0; i < data.tracklist.length; i++) {
-								// 		console.log("HERE: ", data.tracklist[i].artists.name)
-								// 	}
-								// 	console.log("**********************")
-								// 	console.log("ARTIST DATA: ")
-								// 	console.log(data.tracklist)
-								// 	console.log("**********************")
-								// }
-
 								const transformedTrack = {
 									artist: artistString,
 									title: track.title,
 									duration: track.duration,
 									year: data.year && data.year !== 0 ? data.year : '',
 									bpm: '',
+									format: format,
 									genre: data.genres ? data.genres : '',
 									style: data.styles ? data.styles : '',
 									country: data.country ? data.country : '',
