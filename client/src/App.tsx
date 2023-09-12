@@ -30,7 +30,7 @@ const App = () => {
 
 	const handleDataClick = async (event: React.FormEvent) => {
 		try {
-			console.log("PROFILE?: ", profileName)
+			console.log('PROFILE?: ', profileName)
 			const response = await axios.get(`http://localhost:5000/fetch-tracks`, {
 				params: {
 					profileName: profileName,
@@ -100,6 +100,9 @@ const App = () => {
 				<div style={{ padding: '15px', fontWeight: '600', fontSize: '20px' }}>
 					Vinyl Collection App
 				</div>
+				<div style={{ padding: '15px' }}>
+					Enter your Discogs profile name below:
+				</div>
 				<input
 					type='text'
 					placeholder='Enter Discogs profile name'
@@ -113,7 +116,7 @@ const App = () => {
 						handleDataClick(event)
 					}}
 				>
-					Get Data
+					{trackCollection.length !== 0 ? 'Update Data' : 'Get Track Data'}
 				</button>
 			</div>
 

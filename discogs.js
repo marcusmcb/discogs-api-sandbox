@@ -27,7 +27,7 @@ const fetchTrackCollection = async (discogsProfileName) => {
 			col.getReleases(
 				discogsProfileName,
 				0,
-				{ page: 1, per_page: 5 },
+				{ page: 1, per_page: 45 },
 				(err, data) => {
 					if (err) {
 						return reject(err)
