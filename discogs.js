@@ -1,115 +1,116 @@
-const Discogs = require('disconnect').Client
-const dotenv = require('dotenv')
+const Discogs = require('disconnect').Client;
+const dotenv = require('dotenv');
 
-dotenv.config()
+dotenv.config();
 
-const token = process.env.DISCOGS_ACCESS_TOKEN
-const discogs = new Discogs({ userToken: token })
+const token = process.env.DISCOGS_ACCESS_TOKEN;
+const discogs = new Discogs({ userToken: token });
 
-const db = discogs.database()
-const col = discogs.user().collection()
+const db = discogs.database();
+const col = discogs.user().collection();
 
-const fetchTrackCollection = async (discogsProfileName) => {
-	const trackCollection = []
+async function fetchTrackCollection(discogsProfileName) {
+  const trackCollection = [];
+  let page = 1;
+  const per_page = 45;
 
-	return new Promise((resolve, reject) => {
-		try {
-			// db.getRelease(20873707, (err, data) => {
-			// 	if (err) {
-			// 		return reject(err)
-			// 	} else {
-			// 		console.log('DATA: ')					
-			// 		console.log(Object.keys(data))
-			// 		console.log(data)
-			// 	}
-			// })
+  while (true) {
+    const data = await getReleasePage(discogsProfileName, page, per_page);
+    const releases = data.releases;
 
-			col.getReleases(
-				discogsProfileName,
-				0,
-				{ page: 1, per_page: 45 },
-				(err, data) => {
-					if (err) {
-						return reject(err)
-					}
+    for (const item of releases) {
+      await sleep(1000);  // Delay before fetching release details.
+      const releaseData = await getReleaseDetails(item.id);
 
-					let pendingReleases = data.releases.length // Keep track of releases being processed
+      // The following is your code for processing each release and populating trackCollection.
+      let trackLabels = [];
+      const format = releaseData.formats[0].descriptions[0];
+      console.log("------------")
+      console.log(releaseData)
+      if (releaseData.labels) {
+        if (releaseData.labels.length > 1) {
+          for (let i = 0; i < releaseData.labels.length; i++) {
+            trackLabels.push(releaseData.labels[i].name);
+          }
+        } else {
+          trackLabels.push(releaseData.labels[0].name);
+        }
+      }
 
-					data.releases.forEach((item) => {
-						db.getRelease(item.id, (err, data) => {
-							if (err) {
-								return reject(err)
-							}
+      if (trackLabels.length > 1) {
+        trackLabels = [...new Set(trackLabels)];
+      }
 
-							let trackLabels = []
-							const format = data.formats[0].descriptions[0]
+      releaseData.tracklist.forEach((track) => {
+        let artistString = '';
+        if (releaseData.artists[0].name === 'Various' || track.artists) {
+          if (!track.artists) {
+            artistString = ''
+          } else {
+            artistString = track.artists[0].name;
+          }
+        } else {
+          for (let i = 0; i < releaseData.artists.length; i++) {
+            artistString += releaseData.artists[i].name;
+            if (i !== releaseData.artists.length - 1) {
+              artistString += releaseData.artists[i].join
+                ? ` ${releaseData.artists[i].join} `
+                : ' & ';
+            }
+          }
+        }
 
-							if (data.labels) {
-								if (data.labels.length > 1) {
-									for (let i = 0; i < data.labels.length; i++) {
-										console.log(data.labels[i].name)
-										trackLabels.push(data.labels[i].name)
-									}
-								} else {
-									trackLabels.push(data.labels[0].name)
-								}
-							}
+        const transformedTrack = {
+          artist: artistString,
+          title: track.title,
+          duration: track.duration,
+          year: releaseData.year && releaseData.year !== 0 ? releaseData.year : '',
+          bpm: '',
+          format: format,
+          genre: releaseData.genres ? releaseData.genres : [],
+          style: releaseData.styles ? releaseData.styles : [],
+          country: releaseData.country ? releaseData.country : '',
+          labels: trackLabels,
+        };
 
-							if (trackLabels.length > 1) {
-								const uniqueLabels = (arr) => {
-									return [...new Set(arr)]
-								}
-								trackLabels = uniqueLabels(trackLabels)
-								console.log('SET? ', trackLabels)
-							}							
-							
-							data.tracklist.forEach((track) => {								
-								let artistString = ''
-								if (data.artists[0].name === 'Various' || track.artists) {
-									artistString = track.artists[0].name
-								} else {
-									for (let i = 0; i < data.artists.length; i++) {
-										artistString += data.artists[i].name
-										if (i !== data.artists.length - 1) {
-											artistString += data.artists[i].join
-												? ` ${data.artists[i].join} `
-												: ' & '
-										}
-									}
-								}
+        trackCollection.push(transformedTrack);
+      });
 
-								const transformedTrack = {
-									artist: artistString,
-									title: track.title,
-									duration: track.duration,
-									year: data.year && data.year !== 0 ? data.year : '',
-									bpm: '',
-									format: format,
-									genre: data.genres ? data.genres : '',
-									style: data.styles ? data.styles : '',
-									country: data.country ? data.country : '',
-									labels: trackLabels,
-								}
-								trackCollection.push(transformedTrack)
-							})
+    }
 
-							pendingReleases-- // Decrement the count after processing each release
+    if (data.pagination.page === data.pagination.pages) {
+      break;  // All pages fetched
+    }
 
-							if (pendingReleases === 0) {
-								resolve(trackCollection) // If all releases are processed, resolve the promise
-							}
-						})
-					})
-				}
-			)
-		} catch (error) {
-			console.log('DISCOGS ERROR: ')
-			console.log(error)
-			reject(error)
-		}
-	})
+    page++;
+    await sleep(1000);  // Delay before fetching the next page.
+  }
+
+  return trackCollection;
+}
+
+function getReleasePage(username, page, per_page) {
+  return new Promise((resolve, reject) => {
+    col.getReleases(username, 0, { page, per_page }, (err, data) => {
+      if (err) return reject(err);
+      resolve(data);
+    });
+  });
+}
+
+function getReleaseDetails(releaseId) {
+  return new Promise((resolve, reject) => {
+    db.getRelease(releaseId, (err, data) => {
+      if (err) return reject(err);
+      resolve(data);
+    });
+  });
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 module.exports = {
-	fetchTrackCollection,
-}
+  fetchTrackCollection,
+};
